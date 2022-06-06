@@ -10,10 +10,11 @@ from mlflow.tracking import MlflowClient
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import mean_squared_error
 
-HPO_EXPERIMENT_NAME = "random-forest-hyperopt2"
-EXPERIMENT_NAME = "random-forest-best-models1"
+HPO_EXPERIMENT_NAME = "random-forest-hyperopt7"
+EXPERIMENT_NAME = "random-forest-best-models6"
 
 mlflow.set_tracking_uri("http://127.0.0.1:5000")
+mlflow.set_registry_uri("sftp://127.0.0.1:5000")
 mlflow.set_experiment(EXPERIMENT_NAME)
 mlflow.sklearn.autolog()
 
@@ -70,14 +71,15 @@ def run(data_path, log_top):
     experiment = client.get_experiment_by_name(EXPERIMENT_NAME)
     best_run = client.search_runs(
         experiment_ids=experiment.experiment_id,
-        max_results=1,
+        max_results=50,
         order_by=["metrics.rmse ASC"]
     )[0]
 
+    model_uri = f"runs:/{best_run.info.run_id}/sklearn-model"
     # register the best model
     mlflow.register_model(
-        best_run.info.run_id,
-        EXPERIMENT_NAME
+        model_uri,
+        "Model_name_here"
     )
 
 
